@@ -1,28 +1,35 @@
 import socket
 
-msgFromClient = "Hello UDP Server"
-bytesToSend = str.encode(msgFromClient)
-serverAddressPort = ("127.0.0.1", 20001)
-bufferSize = 1024
-
-# Cria um socket UDP no lado do cliente
-UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-
-# Envia para o servidor usando o socket UDP criado
-UDPClientSocket.sendto(bytesToSend, serverAddressPort)
-
-# Recebe a resposta do servidor
-msgFromServer, _ = UDPClientSocket.recvfrom(bufferSize)
-print(f"Mensagem do Servidor: {msgFromServer.decode()}")
-
-# Permite que o cliente faça tentativas infinitas até digitar "sair"
-while True:
-    user_input = input("Digite uma mensagem ('sair' para encerrar): ")
-    if user_input.lower() == "sair":
-        break
-    UDPClientSocket.sendto(str.encode(user_input), serverAddressPort)
+def send_handshake(UDPClientSocket, serverAddressPort, bufferSize):
+    handshake_message = "handshake"
+    UDPClientSocket.sendto(str.encode(handshake_message), serverAddressPort)
     msgFromServer, _ = UDPClientSocket.recvfrom(bufferSize)
-    print(f"Mensagem do Servidor: {msgFromServer.decode()}\n")
+    return msgFromServer.decode() == "Handshake ACK"
 
-# Fecha o socket do cliente
-UDPClientSocket.close()
+def send_message(UDPClientSocket, serverAddressPort, message, bufferSize):
+    UDPClientSocket.sendto(str.encode(message), serverAddressPort)
+    msgFromServer, _ = UDPClientSocket.recvfrom(bufferSize)
+    return msgFromServer.decode()
+
+def run_client(serverAddressPort, bufferSize):
+    UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+
+    if send_handshake(UDPClientSocket, serverAddressPort, bufferSize):
+        print("Conexão estabelecida com o servidor.\n")
+
+        while True:
+            user_input = input("Digite uma mensagem ('sair' para encerrar): ")
+            if user_input.lower() == "sair":
+                break
+            response = send_message(UDPClientSocket, serverAddressPort, user_input, bufferSize)
+            print(f"Mensagem do Servidor: {response}\n")
+    else:
+        print("Falha ao estabelecer conexão com o servidor.")
+
+    UDPClientSocket.close()
+
+if __name__ == "__main__":
+    SERVER_ADDRESS_PORT = ("127.0.0.1", 20001)
+    BUFFER_SIZE = 1024
+
+    run_client(SERVER_ADDRESS_PORT, BUFFER_SIZE)
