@@ -29,7 +29,7 @@ def run_client(serverAddressPort, bufferSize):
     UDPClientSocket.close()
 
 if __name__ == "__main__":
-    SERVER_ADDRESS_PORT = ("127.0.0.1", 20001)
+    SERVER_ADDRESS_PORT = ("10.6.0.40", 20001)
     BUFFER_SIZE = 1024
 
     run_client(SERVER_ADDRESS_PORT, BUFFER_SIZE)

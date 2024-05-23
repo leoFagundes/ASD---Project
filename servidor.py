@@ -1,7 +1,7 @@
 import socket
 
 def show_connected_clients(clients):
-    print(f"\n|  {'Clientes conectados':^30}   |")
+    print(f"|  {'Clientes conectados':^30}   |")
     print(f"| {'Client_IP':^15} | {'Client_PORT':^15} |")
     for client in clients:
         ip, port = client
@@ -12,11 +12,11 @@ def handle_handshake(UDPServerSocket, address, connected_clients):
     handshakeAck = "Handshake ACK"
     UDPServerSocket.sendto(str.encode(handshakeAck), address)
     connected_clients.add(address)
-    print(f"Cliente {address} conectado.\n")
+    print(f"\nhandshake: Cliente {address} conectado.\n")
 
 def handle_client_message(UDPServerSocket, message, address):
     client_ip, client_port = address
-    clientIP = f"IP: {client_ip} | Port: {client_port}"
+    clientIP = f"\nIP: {client_ip} | Port: {client_port}"
     clientMsg = f"Mensagem do Cliente: {message.decode()}"
     print(clientIP)
     print(clientMsg)
@@ -43,13 +43,13 @@ def run_server(localIP, localPort, bufferSize):
         if address not in connected_clients:
             if message.decode() == "handshake":
                 handle_handshake(UDPServerSocket, address, connected_clients)
+                show_connected_clients(list(connected_clients))
             continue
 
         handle_client_message(UDPServerSocket, message, address)
-        show_connected_clients(list(connected_clients))
 
 if __name__ == "__main__":
-    LOCAL_IP = "127.0.0.1"
+    LOCAL_IP = "10.6.0.40"
     LOCAL_PORT = 20001
     BUFFER_SIZE = 1024
 
