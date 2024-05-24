@@ -1,18 +1,27 @@
 import socket
 
 def show_connected_clients(clients):
-    print(f"|  {'Clientes conectados':^30}   |")
-    print(f"| {'Client_IP':^15} | {'Client_PORT':^15} |")
-    for client in clients:
-        ip, port = client
-        print(f"| {ip:^15} | {port:^15} |")
-    print()
+    if clients:
+        print(f"|  {'Clientes conectados':^30}   |")
+        print(f"| {'Client_IP':^15} | {'Client_PORT':^15} |")
+        for client in clients:
+            ip, port = client
+            print(f"| {ip:^15} | {port:^15} |")
+        print()
+    else:
+        print("Nenhum cliente conectado no momento.")
 
 def handle_handshake(UDPServerSocket, address, connected_clients):
     handshakeAck = "Handshake ACK"
     UDPServerSocket.sendto(str.encode(handshakeAck), address)
     connected_clients.add(address)
     print(f"\nhandshake: Cliente {address} conectado.\n")
+
+def handle_disconnect(UDPServerSocket, address, connected_clients):
+    if address in connected_clients:
+        connected_clients.remove(address)
+        print(f"\ndisconnect: Cliente {address} desconectado.\n")
+        show_connected_clients(list(connected_clients))
 
 def handle_client_message(UDPServerSocket, message, address):
     client_ip, client_port = address
@@ -44,6 +53,10 @@ def run_server(localIP, localPort, bufferSize):
             if message.decode() == "handshake":
                 handle_handshake(UDPServerSocket, address, connected_clients)
                 show_connected_clients(list(connected_clients))
+            continue
+
+        if message.decode() == "disconnect":
+            handle_disconnect(UDPServerSocket, address, connected_clients)
             continue
 
         handle_client_message(UDPServerSocket, message, address)

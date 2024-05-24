@@ -11,18 +11,27 @@ def send_message(UDPClientSocket, serverAddressPort, message, bufferSize):
     msgFromServer, _ = UDPClientSocket.recvfrom(bufferSize)
     return msgFromServer.decode()
 
+def send_disconnect(UDPClientSocket, serverAddressPort, bufferSize):
+    disconnect_message = "disconnect"
+    UDPClientSocket.sendto(str.encode(disconnect_message), serverAddressPort)
+
 def run_client(serverAddressPort, bufferSize):
     UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
     if send_handshake(UDPClientSocket, serverAddressPort, bufferSize):
         print("Conexão estabelecida com o servidor.\n")
 
-        while True:
-            user_input = input("Digite uma mensagem ('sair' para encerrar): ")
-            if user_input.lower() == "sair":
-                break
-            response = send_message(UDPClientSocket, serverAddressPort, user_input, bufferSize)
-            print(f"Mensagem do Servidor: {response}\n")
+        try:
+            while True:
+                user_input = input("Digite uma mensagem ('sair' para encerrar): ")
+                if user_input.lower() == "sair":
+                    break
+                response = send_message(UDPClientSocket, serverAddressPort, user_input, bufferSize)
+                print(f"Mensagem do Servidor: {response}\n")
+        finally:
+            send_disconnect(UDPClientSocket, serverAddressPort, bufferSize)
+            print("Desconectado do servidor.")
+
     else:
         print("Falha ao estabelecer conexão com o servidor.")
 
