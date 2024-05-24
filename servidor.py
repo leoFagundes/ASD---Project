@@ -57,7 +57,7 @@ def handle_disconnect(UDPServerSocket: socket.socket, address: tuple, connected_
     """
     if address in connected_clients:
         connected_clients.remove(address)
-        log(f"disconnect: Cliente {address} desconectado.\n")
+        log(f"[disconnect] Cliente {address} desconectado.\n")
         show_connected_clients(list(connected_clients))
 
 def handle_client_message(UDPServerSocket: socket.socket, message: bytes, address: tuple) -> None:
