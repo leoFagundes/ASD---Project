@@ -1,5 +1,19 @@
 import socket
 import threading
+import datetime
+
+def log(text: str = '', showTime: bool = True) -> None:
+    """
+    Exibe um log na tela, opcionalmente mostrando o horário atual.
+
+    Args:
+        text (str, optional): Texto a ser exibido no log. Padrão é ''.
+        showTime (bool, optional): Indica se o horário atual deve ser exibido junto com o texto. Padrão é True.
+    """
+    if text:
+        print(f'{datetime.datetime.now().strftime("%H:%M:%S"):^10}: {text}') if showTime else print(text)
+    else:
+        print()
 
 def show_connected_clients(clients: set) -> None:
     """
@@ -9,14 +23,14 @@ def show_connected_clients(clients: set) -> None:
         clients (set): Conjunto de tuplas contendo endereço IP e porta dos clientes conectados.
     """
     if clients:
-        print(f"|  {'Clientes conectados':^30}   |")
-        print(f"| {'Client_IP':^15} | {'Client_PORT':^15} |")
+        log(f"|  {'Clientes conectados':^30}   |", showTime=False)
+        log(f"| {'Client_IP':^15} | {'Client_PORT':^15} |", showTime=False)
         for client in clients:
             ip, port = client
-            print(f"| {ip:^15} | {port:^15} |")
-        print()
+            log(f"| {ip:^15} | {port:^15} |", showTime=False)
+        log()
     else:
-        print("Nenhum cliente conectado no momento.")
+        log("Nenhum cliente conectado no momento.")
 
 def handle_handshake(UDPServerSocket: socket.socket, address: tuple, connected_clients: set) -> None:
     """
@@ -30,7 +44,7 @@ def handle_handshake(UDPServerSocket: socket.socket, address: tuple, connected_c
     handshakeAck = "Handshake ACK"
     UDPServerSocket.sendto(str.encode(handshakeAck), address)
     connected_clients.add(address)
-    print(f"\nhandshake: Cliente {address} conectado.\n")
+    log(f"[handshake] Cliente {address} conectado.\n")
 
 def handle_disconnect(UDPServerSocket: socket.socket, address: tuple, connected_clients: set) -> None:
     """
@@ -43,7 +57,7 @@ def handle_disconnect(UDPServerSocket: socket.socket, address: tuple, connected_
     """
     if address in connected_clients:
         connected_clients.remove(address)
-        print(f"\ndisconnect: Cliente {address} desconectado.\n")
+        log(f"disconnect: Cliente {address} desconectado.\n")
         show_connected_clients(list(connected_clients))
 
 def handle_client_message(UDPServerSocket: socket.socket, message: bytes, address: tuple) -> None:
@@ -56,10 +70,10 @@ def handle_client_message(UDPServerSocket: socket.socket, message: bytes, addres
         address (tuple): Tupla contendo endereço IP e porta do cliente.
     """
     client_ip, client_port = address
-    clientIP = f"\nIP: {client_ip} | Port: {client_port}"
-    clientMsg = f"Mensagem do Cliente: {message.decode()}"
-    print(clientIP)
-    print(clientMsg)
+    clientIP = f"IP: {client_ip} | Port: {client_port}"
+    clientMsg = f"Mensagem do Cliente: {message.decode()}\n"
+    log(clientIP)
+    log(clientMsg)
     
     if message.decode() == "AA":
         response = "Resposta correta!"
@@ -101,7 +115,7 @@ def run_server(localIP: str, localPort: int, bufferSize: int) -> None:
     """
     UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
     UDPServerSocket.bind((localIP, localPort))
-    print("Servidor UDP ativo e ouvindo...\n")
+    log("Servidor UDP ativo e ouvindo...\n")
 
     connected_clients = set()
 
