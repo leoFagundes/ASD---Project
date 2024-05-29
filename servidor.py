@@ -2,7 +2,10 @@ import socket
 import threading
 import datetime
 
-limit = 2000000000
+from decimal import *
+getcontext().prec = 28
+
+limit = 1000000
 
 def log(text: str = '', showTime: bool = True) -> None:
     """
@@ -96,10 +99,10 @@ def handle_client_monte_carlo(UDPServerSocket: socket.socket, message: bytes, ad
     total_points = 0
     points_in_circle = 0
 
-    if total_points < limit:
-        points_in_circle += int(tupla[0])
-        total_points += int(tupla[1])
-        print("Pontos dentro do circulo: ", points_in_circle, " | ", "Total de pontos: ", total_points, " | ", "Valor de pi: ", 4*(points_in_circle / total_points), "\n")
+    while total_points < limit:
+        points_in_circle += Decimal(tupla[0])
+        total_points += Decimal(tupla[1])
+        print("Pontos dentro do circulo: ", points_in_circle, " | ", "Total de pontos: ", total_points, " | ", "Valor de pi: ", round(Decimal(4*(points_in_circle / total_points)), 20), "\n")
         response = "Dados adicionados"
     else:
         response = "Limite de pontos alcancado"
