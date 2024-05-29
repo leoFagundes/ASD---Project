@@ -1,17 +1,14 @@
 import socket
-from random import random
+import random
+import time
+from numpy import random
 
 def monte_carlo():
-    total_points = 0
-    points_in_circle = 0
-    point_limit = 500
-    while total_points != point_limit:
-        x = random()
-        y = random()
-        total_points += 1
-        if (x*x) + (y*y) <= 1:
-            points_in_circle += 1
-    return (points_in_circle, total_points)
+    x = random.rand()
+    print(x)
+    y = random.rand()
+    print(y)
+    return (x, y)
 
 
 def send_handshake(UDPClientSocket: socket.socket, serverAddressPort: tuple, bufferSize: int) -> bool:
@@ -75,8 +72,8 @@ def run_client(serverAddressPort: tuple, bufferSize: int) -> None:
 
         try:
             while True:
-                user_input = monte_carlo()
-                response = send_message(UDPClientSocket, serverAddressPort, user_input, bufferSize)
+                tupla = monte_carlo()
+                response = send_message(UDPClientSocket, serverAddressPort, tupla, bufferSize)
                 print(f"Mensagem do Servidor: {response}\n")
                 if response == "Limite de pontos alcancado":
                     break

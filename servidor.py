@@ -4,8 +4,11 @@ import datetime
 
 from decimal import *
 getcontext().prec = 28
+getcontext().rounding = ROUND_05UP
 
-limit = 1000000
+limit = 100000
+total_points = 0
+points_in_circle = 0
 
 def log(text: str = '', showTime: bool = True) -> None:
     """
@@ -96,12 +99,17 @@ def handle_client_monte_carlo(UDPServerSocket: socket.socket, message: bytes, ad
     log(clientMsg)
     tupla = message.decode().split(",")
 
-    total_points = 0
-    points_in_circle = 0
+    global total_points
+    global points_in_circle
 
-    while total_points < limit:
-        points_in_circle += Decimal(tupla[0])
-        total_points += Decimal(tupla[1])
+    if total_points < limit:
+        x = Decimal(tupla[0])
+        print(x)
+        y = Decimal(tupla[1])
+        print(y)
+        total_points += 1
+        if ((x*x) + (y*y)) <= 1:
+            points_in_circle += 1     
         print("Pontos dentro do circulo: ", points_in_circle, " | ", "Total de pontos: ", total_points, " | ", "Valor de pi: ", round(Decimal(4*(points_in_circle / total_points)), 20), "\n")
         response = "Dados adicionados"
     else:
