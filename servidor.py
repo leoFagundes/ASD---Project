@@ -2,6 +2,8 @@ import socket
 import threading
 import datetime
 
+limit = 2000000000
+
 def log(text: str = '', showTime: bool = True) -> None:
     """
     Exibe um log na tela, opcionalmente mostrando o horário atual.
@@ -82,6 +84,30 @@ def handle_client_message(UDPServerSocket: socket.socket, message: bytes, addres
 
     UDPServerSocket.sendto(str.encode(response), address)
 
+def handle_client_monte_carlo(UDPServerSocket: socket.socket, message: bytes, address: tuple):
+
+    client_ip, client_port = address
+    clientIP = f"IP: {client_ip} | Port: {client_port}"
+    clientMsg = f"Tupla do Cliente: {message.decode()}\n"
+    log(clientIP)
+    log(clientMsg)
+    tupla = message.decode().split(",")
+
+    total_points = 0
+    points_in_circle = 0
+
+    if total_points < limit:
+        points_in_circle += int(tupla[0])
+        total_points += int(tupla[1])
+        print("Pontos dentro do circulo: ", points_in_circle, " | ", "Total de pontos: ", total_points, " | ", "Valor de pi: ", 4*(points_in_circle / total_points), "\n")
+        response = "Dados adicionados"
+    else:
+        response = "Limite de pontos alcancado"
+
+    UDPServerSocket.sendto(str.encode(response), address)
+        
+    
+
 def client_thread(UDPServerSocket: socket.socket, message: bytes, address: tuple, connected_clients: set) -> None:
     """
     Thread para lidar com as mensagens de um cliente.
@@ -102,7 +128,7 @@ def client_thread(UDPServerSocket: socket.socket, message: bytes, address: tuple
         handle_disconnect(UDPServerSocket, address, connected_clients)
         return
 
-    handle_client_message(UDPServerSocket, message, address)
+    handle_client_monte_carlo(UDPServerSocket, message, address)
 
 def run_server(localIP: str, localPort: int, bufferSize: int) -> None:
     """

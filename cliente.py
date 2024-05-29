@@ -1,4 +1,18 @@
 import socket
+from random import random
+
+def monte_carlo():
+    total_points = 0
+    points_in_circle = 0
+    point_limit = 500
+    while total_points != point_limit:
+        x = random()
+        y = random()
+        total_points += 1
+        if (x*x) + (y*y) <= 1:
+            points_in_circle += 1
+    return (points_in_circle, total_points)
+
 
 def send_handshake(UDPClientSocket: socket.socket, serverAddressPort: tuple, bufferSize: int) -> bool:
     """
@@ -17,7 +31,7 @@ def send_handshake(UDPClientSocket: socket.socket, serverAddressPort: tuple, buf
     msgFromServer, _ = UDPClientSocket.recvfrom(bufferSize)
     return msgFromServer.decode() == "Handshake ACK"
 
-def send_message(UDPClientSocket: socket.socket, serverAddressPort: tuple, message: str, bufferSize: int) -> str:
+def send_message(UDPClientSocket: socket.socket, serverAddressPort: tuple, message: tuple, bufferSize: int) -> str:
     """
     Envia uma mensagem para o servidor e aguarda a resposta.
 
@@ -30,7 +44,7 @@ def send_message(UDPClientSocket: socket.socket, serverAddressPort: tuple, messa
     Returns:
         str: Resposta recebida do servidor.
     """
-    UDPClientSocket.sendto(str.encode(message), serverAddressPort)
+    UDPClientSocket.sendto(str.encode(str(message[0]) + "," + str(message[1])), serverAddressPort)
     msgFromServer, _ = UDPClientSocket.recvfrom(bufferSize)
     return msgFromServer.decode()
 
@@ -61,11 +75,11 @@ def run_client(serverAddressPort: tuple, bufferSize: int) -> None:
 
         try:
             while True:
-                user_input = input("Digite uma mensagem ('sair' para encerrar): ")
-                if user_input.lower() == "sair":
-                    break
+                user_input = monte_carlo()
                 response = send_message(UDPClientSocket, serverAddressPort, user_input, bufferSize)
                 print(f"Mensagem do Servidor: {response}\n")
+                if response == "Limite de pontos alcancado":
+                    break
         finally:
             send_disconnect(UDPClientSocket, serverAddressPort, bufferSize)
             print("Desconectado do servidor.")
