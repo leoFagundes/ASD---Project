@@ -5,9 +5,7 @@ from numpy import random
 
 def monte_carlo():
     x = random.rand()
-    print(x)
     y = random.rand()
-    print(y)
     if ((x*x) + (y*y)) <= 1:
         return '1'
     else:
@@ -77,7 +75,7 @@ def run_client(serverAddressPort: tuple, bufferSize: int) -> None:
             while True:
                 tupla = monte_carlo()
                 response = send_message(UDPClientSocket, serverAddressPort, tupla, bufferSize)
-                print(f"Mensagem do Servidor: {response}\n")
+                #print(f"Mensagem do Servidor: {response}\n")
                 if response == "Limite de pontos alcancado":
                     break
         finally:

@@ -95,29 +95,30 @@ def handle_client_monte_carlo(UDPServerSocket: socket.socket, message: bytes, ad
     client_ip, client_port = address
     clientIP = f"IP: {client_ip} | Port: {client_port}"
     clientMsg = f"Tupla do Cliente: {message.decode()}\n"
-    log(clientIP)
-    log(clientMsg)
     isInsideCircle = message.decode()
 
     global total_points
     global points_in_circle
 
+    horarioInicial = datetime.datetime.now()
+
     if total_points < limit:
         total_points += 1
         if isInsideCircle == '1':
             points_in_circle += 1     
-        print("Pontos dentro do circulo: ", points_in_circle, " | ", "Total de pontos: ", total_points, " | ", "Valor de pi: ", round(Decimal(4*(points_in_circle / total_points)), 20), "\n")
         response = "Dados adicionados"
     else:
         response = "Limite de pontos alcancado"
-        print(datetime.datetime.now())
+        print("Pontos dentro do circulo: ", points_in_circle, " | ", "Total de pontos: ", total_points, " | ", "Valor de pi: ", round(Decimal(4*(points_in_circle / total_points)), 20), "\n")
+        log(response)
+        #print(datetime.datetime.now())
 
     UDPServerSocket.sendto(str.encode(response), address)
         
     
 
 def client_thread(UDPServerSocket: socket.socket, message: bytes, address: tuple, connected_clients: set) -> None:
-    print(datetime.datetime.now())
+    #print(datetime.datetime.now())
     """
     Thread para lidar com as mensagens de um cliente.
 
