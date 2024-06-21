@@ -8,7 +8,10 @@ def monte_carlo():
     print(x)
     y = random.rand()
     print(y)
-    return (x, y)
+    if ((x*x) + (y*y)) <= 1:
+        return '1'
+    else:
+        return '0'
 
 
 def send_handshake(UDPClientSocket: socket.socket, serverAddressPort: tuple, bufferSize: int) -> bool:
@@ -41,7 +44,7 @@ def send_message(UDPClientSocket: socket.socket, serverAddressPort: tuple, messa
     Returns:
         str: Resposta recebida do servidor.
     """
-    UDPClientSocket.sendto(str.encode(str(message[0]) + "," + str(message[1])), serverAddressPort)
+    UDPClientSocket.sendto(str.encode(message), serverAddressPort)
     msgFromServer, _ = UDPClientSocket.recvfrom(bufferSize)
     return msgFromServer.decode()
 
@@ -87,7 +90,7 @@ def run_client(serverAddressPort: tuple, bufferSize: int) -> None:
     UDPClientSocket.close()
 
 if __name__ == "__main__":
-    SERVER_ADDRESS_PORT = ("10.6.0.40", 20001)
+    SERVER_ADDRESS_PORT = ("172.22.88.12", 20001)
     BUFFER_SIZE = 1024
 
     run_client(SERVER_ADDRESS_PORT, BUFFER_SIZE)

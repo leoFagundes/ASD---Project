@@ -6,7 +6,7 @@ from decimal import *
 getcontext().prec = 28
 getcontext().rounding = ROUND_05UP
 
-limit = 100000
+limit = 20000
 total_points = 0
 points_in_circle = 0
 
@@ -97,29 +97,27 @@ def handle_client_monte_carlo(UDPServerSocket: socket.socket, message: bytes, ad
     clientMsg = f"Tupla do Cliente: {message.decode()}\n"
     log(clientIP)
     log(clientMsg)
-    tupla = message.decode().split(",")
+    isInsideCircle = message.decode()
 
     global total_points
     global points_in_circle
 
     if total_points < limit:
-        x = Decimal(tupla[0])
-        print(x)
-        y = Decimal(tupla[1])
-        print(y)
         total_points += 1
-        if ((x*x) + (y*y)) <= 1:
+        if isInsideCircle == '1':
             points_in_circle += 1     
         print("Pontos dentro do circulo: ", points_in_circle, " | ", "Total de pontos: ", total_points, " | ", "Valor de pi: ", round(Decimal(4*(points_in_circle / total_points)), 20), "\n")
         response = "Dados adicionados"
     else:
         response = "Limite de pontos alcancado"
+        print(datetime.datetime.now())
 
     UDPServerSocket.sendto(str.encode(response), address)
         
     
 
 def client_thread(UDPServerSocket: socket.socket, message: bytes, address: tuple, connected_clients: set) -> None:
+    print(datetime.datetime.now())
     """
     Thread para lidar com as mensagens de um cliente.
 
@@ -165,8 +163,8 @@ def run_server(localIP: str, localPort: int, bufferSize: int) -> None:
         thread.start()
 
 if __name__ == "__main__":
-    LOCAL_IP = "10.6.0.40"
+    LOCAL_IP = "172.22.88.12"
     LOCAL_PORT = 20001
-    BUFFER_SIZE = 1024
+    BUFFER_SIZE = 2048
 
     run_server(LOCAL_IP, LOCAL_PORT, BUFFER_SIZE)
