@@ -30,7 +30,7 @@ O projeto é composto por dois scripts principais:
 
 ### Requisitos
 
-- Python 3.x
+- Python
 
 ### Passos
 
